@@ -46,9 +46,6 @@ template <typename T, uint8_t... Args>
 class setPin
 {
 public:
-    // static void create(){
-
-    // };
     setPin() {}
 };
 
