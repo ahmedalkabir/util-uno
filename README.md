@@ -13,32 +13,26 @@ and follow the example below
 ```c++
 #include <util-uno.hpp>
 
-void setup()
-{
-  // put your setup code here, to run once:
-
-  // set pins as output
-  io::setPin<io::output, 7, 8, 9, 10, 11, 12, 13>();
-  
-  // set pins as input
-  io::setPin<io::input, 2, 3, 4>();
-
-  // write HIGH to pins
-  io::writePin<io::high, 7, 8, 9, 10, 11, 12, 13>();
-
-  delay(5000);
-
-  // write low to some of pins
-  io::writePin<io::low, 7, 9, 11, 13>();
+// you must write OUTPUT as first template parameter 
+// otherwise it will not work properly 
+// if you need inverse output just write true inside constructor parameter
+GPIO<OUTPUT, A1, A2, A3> output_a1_a2_a3(false);
+void setup() {
 }
 
-void loop()
-{
-  // put your main code here, to run repeatedly:
-  io::writePin<io::low, 7, 8, 9, 10, 11, 12, 13>();
-  delay(1000);
-  io::writePin<io::high, 7, 8, 9, 10, 11, 12, 13>();
-  delay(1000);
+void loop() {
+  // setup the pins high
+  output_a1_a2_a3.high();
+  delay(500);
+  // setup the pins low
+  output_a1_a2_a3.low();
+  delay(500);
+  // or 
+  // in case you want inline method
+  (GPIO<OUTPUT, A1, A2, A3>(true)).high();
+  delay(500);
+  (GPIO<OUTPUT, A1, A2, A3>(true)).low();
+  delay(500);
 }
 
 ```
