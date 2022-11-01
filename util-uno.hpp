@@ -10,159 +10,68 @@
 
 #include <Arduino.h>
 
-namespace io
-{
-
-struct mode_t
-{
+template<uint8_t T, uint8_t... Args>
+class GPIO {
+  public:
+    GPIO(bool inverse = false){
+    }
+    void high() {};
+    void low() {};
 };
 
-struct status_t
-{
-};
-
-struct input_t : mode_t
-{
-};
-struct output_t : mode_t
-{
-};
-
-struct hight_t : status_t
-{
-};
-struct low_t : status_t
-{
-};
-
-typedef input_t input;
-typedef output_t output;
-
-typedef hight_t high;
-typedef low_t low;
-
-// setPin Function
-template <typename T, uint8_t... Args>
-class setPin
-{
-public:
-    setPin() {}
-};
-
-template <uint8_t... Args>
-class setPin<input, Args...>
-{
-public:
-    setPin()
-    {
-        _setPin(Args...);
+template<uint8_t... Args>
+class GPIO<OUTPUT, Args...>{
+  public:
+    GPIO(bool inverse){
+      _inverse = inverse;
+      _set_output(Args...);
+    }
+    void high(){
+      if(not _inverse){
+        _set_pin_high(0, Args...);
+      } else {
+        _set_pin_low(0, Args...);
+      }
+    }
+    void low(){
+      if(not _inverse){
+        _set_pin_low(0, Args...);
+      } else {
+        _set_pin_high(0, Args...);
+      }
+    }
+  private:
+    void _set_output(uint8_t pin){
+      pinMode(pin, OUTPUT);
     }
 
-private:
-    static void _setPin(uint8_t pin)
-    {
-        pinMode(pin, INPUT);
+    template<typename... Pins>
+    void _set_output(uint8_t pin, Pins... args){
+      _set_output(pin);
+      _set_output(args...);
     }
 
-    template <typename... Pins>
-    static void _setPin(uint8_t pin, Pins... args)
-    {
-        _setPin(pin);
-        _setPin(args...);
-    }
-};
-
-template <uint8_t... Args>
-class setPin<output, Args...>
-{
-public:
-    setPin()
-    {
-        _setPin(Args...);
+    void _set_pin_high(uint8_t pin){
+      digitalWrite(pin, HIGH);
     }
 
-private:
-    static void _setPin(uint8_t pin)
-    {
-        pinMode(pin, OUTPUT);
+    void _set_pin_low(uint8_t pin){
+      digitalWrite(pin, LOW);
     }
 
-    template <typename... Pins>
-    static void _setPin(uint8_t pin, Pins... args)
-    {
-        _setPin(pin);
-        _setPin(args...);
-    }
-};
-
-// writePin Function
-template <typename T, uint8_t... Args>
-class writePin
-{
-public:
-    writePin() {}
-};
-
-template <uint8_t... Args>
-class writePin<low, Args...>
-{
-public:
-    writePin(bool write = true)
-    {
-        if (write)
-        {
-            _writePin(Args...);
-        }
+    template<typename... Pins>
+    void _set_pin_high(uint8_t pin, Pins... args){
+      _set_pin_high(pin);
+      _set_pin_high(args...);
     }
 
-    void write()
-    {
-        _writePin(Args...);
+    template<typename... Pins>
+    void _set_pin_low(uint8_t pin, Pins... args){
+      _set_pin_low(pin);
+      _set_pin_low(args...);
     }
-
-private:
-    static void _writePin(uint8_t pin)
-    {
-        digitalWrite(pin, LOW);
-    }
-
-    template <typename... Pins>
-    static void _writePin(uint8_t pin, Pins... args)
-    {
-        _writePin(pin);
-        _writePin(args...);
-    }
-};
-
-template <uint8_t... Args>
-class writePin<high, Args...>
-{
-public:
-    writePin(bool write = true)
-    {
-        if (write)
-        {
-            _writePin(Args...);
-        }
-    }
-
-    void write()
-    {
-        _writePin(Args...);
-    }
-
-private:
-    void _writePin(uint8_t pin)
-    {
-        digitalWrite(pin, HIGH);
-    }
-
-    template <typename... Pins>
-    void _writePin(uint8_t pin, Pins... args)
-    {
-        _writePin(pin);
-        _writePin(args...);
-    }
+    
+    bool _inverse = false;
 };
 
 }; // namespace io
